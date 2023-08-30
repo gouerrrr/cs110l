@@ -16,6 +16,7 @@ extern crate rand;
 use rand::Rng;
 use std::fs;
 use std::io;
+use std::io::stdout;
 use std::io::Write;
 
 const NUM_INCORRECT_GUESSES: u32 = 5;
@@ -32,7 +33,7 @@ fn main() {
     // Note: given what you know about Rust so far, it's easier to pull characters out of a
     // vector than it is to pull them out of a string. You can get the ith character of
     // secret_word by doing secret_word_chars[i].
-    let secret_word_chars: Vec<char> = secret_word.chars().collect();
+    // let secret_word_chars: Vec<char> = secret_word.chars().collect();
     // Uncomment for debugging:
     println!("random word: {}", secret_word);
 
@@ -48,17 +49,17 @@ fn main() {
     loop {
         print!("The word so far is ");
         for i in &so_far_word_chars {
-            print!("{}", i);
+            print!("{}", *i);
         }
         print!("\nYou have guessed the following letters:");
         for i in &gussed_letters {
-            print!("{}", i);
+            print!("{}", *i);
         }
-        println!("\nYou have {} guesses left", rest_chances);
+        print!("\n");
+        println!("You have {} guesses left", rest_chances);
         let input_letter: char = get_letter();
         gussed_letters.push(input_letter);
         let mut letter_is_not_in = true;
-
         for i in 0..secret_word.len() {
             if input_letter != secret_word_chars[i] {
                 continue;
@@ -68,19 +69,37 @@ fn main() {
             }
         }
         if letter_is_not_in {
-            println!("Sorry, that letter is not in the word\n");
+            println!("Sorry, that letter is not in the word");
             rest_chances -= 1;
         }
+        print!("\n");
+
         if rest_chances == 0 {
             print!("Sorry, you ran out of guesses!");
+            break;
+        }
+        let mut waiting_for_guess = false;
+        for i in &so_far_word_chars {
+            if *i == '-' {
+                waiting_for_guess = true;
+            }
+        }
+
+        if !waiting_for_guess {
+            let show_word: String = so_far_word_chars.clone().into_iter().collect();
+            println!(
+                "Congratulations you guessed the secret word: {} !",
+                show_word
+            );
             break;
         }
     }
 }
 
 fn get_letter() -> char {
-    println!("Please guess a letter:  ");
+    print!("Please guess a letter:");
+    io::stdout().flush().unwrap();
     let mut input_string = String::new();
-    io::stdin().read_line(&mut input_string);
+    let _ = io::stdin().read_line(&mut input_string);
     input_string.chars().next().unwrap()
 }
