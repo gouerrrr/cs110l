@@ -9,6 +9,22 @@ fn main() {
     println!("{}", ref3.to_uppercase());
 }
 ```
+This can't work because s has been borrowed by ref1. A mutable variable can only been borrow once with changing the value. A unmutable variable can be borrowed many times without changing the value.
+To solve the problem, maybe we can use the "clone()" function like this:
+```
+fn main() {
+    let mut s = String::from("hello");
+    let ref1 = &s.clone();
+    let ref2 = &ref1;
+    let ref3 = &ref2;
+    s = String::from("goodbye");
+    println!("{}", ref3.to_uppercase());
+}
+
+```
+
+
+
 
 
 
@@ -19,6 +35,7 @@ fn drip_drop() -> &String {
     return &s;
 }
 ```
+The code has something wrong because you can't borrow a variable which is going to die after ececuting the function. The thing we can do is to just return the String but not the reference.
 
 
 
@@ -32,3 +49,26 @@ fn main() {
     println!("{}", s2);
 }
 ```
+It won't work for take out the data from a Vec. If take out is a pessary, use the remove() function. Or just borrow that work.
+```
+fn main() {
+    let s1 = String::from("hello");
+    let mut v = Vec::new();
+    v.push(s1);
+    let s2: String = v.remove(0);
+    println!("{}", s2);
+}
+
+```
+
+
+```
+fn main() {
+    let s1 = String::from("hello");
+    let mut v = Vec::new();
+    v.push(s1);
+    let s2: &String = &v[0];
+    println!("{}", s2);
+}
+```
+
