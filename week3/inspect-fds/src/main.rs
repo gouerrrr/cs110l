@@ -15,12 +15,9 @@ fn main() {
     
     // TODO: Milestone 1: Get the target Process using psutils::get_target()
     match ps_utils::get_target(&target).expect("msg") {
-        Some(pro)=>println!("Found pid {}",pro.pid),
+        Some(pro)=>pro.print(),
         None=>{println!("Target \"{}\" did not match any running PIDs or executables",target);
         std::process::exit(1);},
-    // Err(e)=>{println!("{}",e);
-    // std::process::exit(1);},
-        
     }
 }
 
