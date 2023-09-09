@@ -22,18 +22,27 @@ impl Process {
     /// descriptor table.)
     // #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
-        // TODO: implement for Milestone 3
-        // unimplemented!();
+
         let mut res:Vec<usize>=Vec::new();
-        let f =fs::read_dir("/proc").expect("bad path which can't open!!");
+        let f =match  fs::read_dir(format!("/proc/{}/fd",self.pid)){
+            Ok(f1) =>f1,
+            Err(e)=> return None,
+        };
+       
+
         for entry in f{
-            let dir=entry.expect("something wrong when engtry the file.");
-            let dir_name=dir.file_name();
-            println!("{:?}",dir_name);
-            let strname=dir_name.into_string().expect("msg");
-            res.push(strname.parse::<usize>().expect("msg"));
+            let id=entry.ok()?.file_name().to_str()?.parse::<usize>().ok()?;
+            res.push(id);
+           
+            
+           
         }
-        Some(res)
+        
+        if !res.is_empty(){
+            println!("{:?}",res);
+            Some(res)
+        }
+       else{None}
     }
 
     /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
