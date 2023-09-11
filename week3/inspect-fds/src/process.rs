@@ -28,16 +28,10 @@ impl Process {
             Ok(f1) =>f1,
             Err(e)=> return None,
         };
-       
-
         for entry in f{
             let id=entry.ok()?.file_name().to_str()?.parse::<usize>().ok()?;
-            res.push(id);
-           
-            
-           
-        }
-        
+            res.push(id); 
+        }  
         if !res.is_empty(){
             println!("{:?}",res);
             Some(res)
@@ -59,6 +53,26 @@ impl Process {
 
     pub fn print(&self){
         println!("========== \"{}\" (pid {}, ppid {}) ==========",self.command,self.pid,self.ppid);
+        match self.list_open_files() {
+            None => println!(
+                "Warning: could not inspect file descriptors for this process! \
+                    It might have exited just as we were about to look at its fd table, \
+                    or it might have exited a while ago and is waiting for the parent \
+                    to reap it."
+            ),
+            Some(open_files) => {
+                for (fd, file) in open_files {
+                    println!(
+                        "{:<4} {:<15} cursor: {:<4} {}",
+                        fd,
+                        format!("({})", file.access_mode),
+                        file.cursor,
+                        file.colorized_name(),
+                    );
+                }
+            }
+        }
+        
     }
 }
 
