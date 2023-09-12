@@ -108,9 +108,13 @@ impl<T:std::cmp::Eq> PartialEq for LinkedList<T>{
                 else{current_self=&node_self.next;current_other=&node_other.next;}
                 
             }
-            true
-    
+            true    
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
+    }
 }
 
-}
+
 
